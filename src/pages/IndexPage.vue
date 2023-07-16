@@ -54,7 +54,11 @@ export default defineComponent({
   name: 'IndexPage',
   methods: {
     onRejected(files) {
-      console.log('rejected files', files)
+      this.$q.notify({
+          message: "Files could not be processed. Must be PDF smaller than 1MB",
+          color: "negative",
+          position: "top-right"
+        })
     },
     dataURItoBlob(dataURI) {
       var byteString = atob(dataURI.split(',')[1]);
@@ -136,7 +140,6 @@ export default defineComponent({
         if(that.readapikey != "") {
           sealItVerify = sealItVerify + "?readkey=" + encodeURIComponent(that.readapikey)
         }
-        console.log(sealItVerify)
         let url2 = await QRCode.toDataURL(sealItVerify)
         let pngImage = await pdfDoc.embedPng(url2)
         const pngDims = pngImage.scale(1)
