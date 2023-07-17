@@ -15,17 +15,19 @@
             </q-card-title>
             <q-card-section>
               <q-form ref="mainform">
-              <q-file v-model="fileChoosed" :rules="[val => !! val || 'PDF is required']" outlined label="Drop or choose PDF here (max 1mb)" accept=".pdf, application/pdf"
-                max-file-size="1048576" @rejected="onRejected" />
-                <q-input label="Immudb Vault Write Key" :rules="[val => !! val || 'Write API Key is required']"  type="password" v-model="writeapikey" outlined></q-input>
-                <q-input label="Immudb Vault Read Key (optional)" v-model="readapikey"  type="password" outlined></q-input>
+                <q-file v-model="fileChoosed" :rules="[val => !!val || 'PDF is required']" outlined
+                  label="Drop or choose PDF here (max 1mb)" accept=".pdf, application/pdf" max-file-size="1048576"
+                  @rejected="onRejected" />
+                <q-input label="immudb Vault Write Key" :rules="[val => !!val || 'Write API Key is required']"
+                  type="password" v-model="writeapikey" outlined></q-input>
+                <q-input label="immudb Vault Read Key (optional)" v-model="readapikey" type="password" outlined></q-input>
               </q-form>
             </q-card-section>
             <q-card-actions align="right">
               <q-btn color="primary" label="Seal it 🦭!" @click="stampFile" />
             </q-card-actions>
             <q-card-actions>
-              (All data are processed in browser, and saved directly into Immudb Vault. No external server is involved)
+              (All data are processed in browser, and saved directly into immudb Vault. No external server is involved)
             </q-card-actions>
           </q-card-section>
 
@@ -55,10 +57,10 @@ export default defineComponent({
   methods: {
     onRejected(files) {
       this.$q.notify({
-          message: "Files could not be processed. Must be PDF smaller than 1MB",
-          color: "negative",
-          position: "top-right"
-        })
+        message: "Files could not be processed. Must be PDF smaller than 1MB",
+        color: "negative",
+        position: "top-right"
+      })
     },
     dataURItoBlob(dataURI) {
       var byteString = atob(dataURI.split(',')[1]);
@@ -75,28 +77,28 @@ export default defineComponent({
     async addPDFDocument(doc) {
       let base64d = await this.toBase64(doc)
       try {
-        
-      let result = await api.put("/ledger/default/collection/default/document", {
-        doc: base64d
-      }, {
-        headers: {
-          "X-API-KEY": this.writeapikey,
-          "Content-Type": "application/json"
-        }
-      })
-      if (result.status == 200) {
-        return result.data.documentId
-      }
-      return null
-    } catch(err ) {
 
-      this.$q.notify({
+        let result = await api.put("/ledger/default/collection/default/document", {
+          doc: base64d
+        }, {
+          headers: {
+            "X-API-KEY": this.writeapikey,
+            "Content-Type": "application/json"
+          }
+        })
+        if (result.status == 200) {
+          return result.data.documentId
+        }
+        return null
+      } catch (err) {
+
+        this.$q.notify({
           message: "Something goes wrong with uploading an document. Check your credentials",
           color: "negative",
           position: "top-right"
         })
-      return null
-    }
+        return null
+      }
 
     },
     toBase64(file) {
@@ -110,7 +112,7 @@ export default defineComponent({
     },
     async stampFile() {
       const validated = await this.$refs.mainform.validate()
-      if(!validated) {
+      if (!validated) {
         this.$q.notify({
           message: "You must provide required fields",
           color: "negative",
@@ -122,7 +124,7 @@ export default defineComponent({
       let that = this
       var reader = new FileReader();
       let documentID = await this.addPDFDocument(this.fileChoosed)
-      if(documentID == null ){
+      if (documentID == null) {
         return
       }
       reader.onload = async function () {
@@ -137,7 +139,7 @@ export default defineComponent({
         const page = pdfDoc.addPage()
         const { width, height } = page.getSize()
         let sealItVerify = window.location.origin + "/#/verify/" + documentID
-        if(that.readapikey != "") {
+        if (that.readapikey != "") {
           sealItVerify = sealItVerify + "?readkey=" + encodeURIComponent(that.readapikey)
         }
         let url2 = await QRCode.toDataURL(sealItVerify)
@@ -150,7 +152,7 @@ export default defineComponent({
           height: pngDims.height,
         })
 
-        page.drawText('Document was sealed in Immudb Vault. Scan QR code to see original document.', {
+        page.drawText('Document was sealed in immudb Vault. Scan QR code to see original document.', {
           x: 100,
           y: height / 2 + 300,
           size: 10,
