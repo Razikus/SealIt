@@ -39,7 +39,7 @@
 
 <style>
 .uploadcard {
-  width: 1024px;
+  max-width: 1024px;
 }
 </style>
 
